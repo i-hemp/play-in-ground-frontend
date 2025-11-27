@@ -12,6 +12,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import GroundsPage from "./pages/GroundPage";
 import PageNotFound from "./pages/PageNotFound";
+import AuthPage from "./pages/AuthPage";
 
 const HeaderLayout = () => (
   <>
@@ -34,6 +35,7 @@ const router = createBrowserRouter(
         { path: "grounds", element: <GroundsPage /> },
         { path: "about", element: <About /> },
         { path: "contact", element: <Contact /> },
+        {path:"auth",element:<AuthPage/>},
         { path: "*", element: <PageNotFound /> },
       ],
     },
