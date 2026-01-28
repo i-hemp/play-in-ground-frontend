@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import GroundCard from "../components/GroundCard";
 import axios from "axios";
 import { API_URL } from "../lib/api";
+import { toast } from "react-toastify";
 
 export default function GroundsPage() {
     const [grounds, setGrounds] = useState([]);
     const [selectedGround, setSelectedGround] = useState(null);
     const [filteredGrounds, setFilteredGrounds] = useState([]);
     const [query, setQuery] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadData() {
@@ -17,6 +20,7 @@ export default function GroundsPage() {
                 setFilteredGrounds(response.data);
             } catch (error) {
                 console.error("Failed to fetch grounds:", error);
+                toast.error("Failed to load grounds. Please try again.");
             }
         }
         loadData();
@@ -37,6 +41,22 @@ export default function GroundsPage() {
             })
         );
     }, [query, grounds]);
+
+    const handleBookNow = () => {
+        // Check if user is logged in
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            toast.error("Please login to book a ground");
+            setTimeout(() => {
+                navigate("/auth");
+            }, 1500);
+            return;
+        }
+
+        // Navigate to booking page with correct ground ID
+        navigate(`/book/${selectedGround.id}`);
+    };
 
     return (
         <main className="min-h-screen bg-gray-900 text-white p-6">
@@ -79,12 +99,20 @@ export default function GroundsPage() {
                             {selectedGround.description || "No description available."}
                         </p>
 
-                        <button
-                            onClick={() => setSelectedGround(null)}
-                            className="mt-4 px-4 py-2 bg-red-500 rounded hover:bg-red-600"
-                        >
-                            Close
-                        </button>
+                        <div className="flex gap-3 mt-4">
+                            <button
+                                onClick={handleBookNow}
+                                className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 font-semibold"
+                            >
+                                Book Now
+                            </button>
+                            <button
+                                onClick={() => setSelectedGround(null)}
+                                className="flex-1 px-4 py-2 bg-red-500 rounded hover:bg-red-600"
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

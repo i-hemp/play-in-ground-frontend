@@ -1,19 +1,30 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext();
+
+// Custom hook to use auth context
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
+    }
+    return context;
+};
 
 export default function AuthProvider({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userInitial, setUserInitial] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [token, setToken] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const storedToken = localStorage.getItem("token");
         const name = localStorage.getItem("name");
         const role = localStorage.getItem("role");
 
-        if (token) {
+        if (storedToken) {
             setIsLoggedIn(true);
+            setToken(storedToken);
             if (name) setUserInitial(name[0].toUpperCase());
             if (role) setUserRole(role);
         } else {
@@ -28,10 +39,11 @@ export default function AuthProvider({ children }) {
         setIsLoggedIn(false);
         setUserInitial(null);
         setUserRole(null);
+        setToken(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, userInitial, userRole, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, userInitial, userRole, token, logout }}>
             {children}
         </AuthContext.Provider>
     );

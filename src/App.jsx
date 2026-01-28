@@ -14,6 +14,11 @@ import GroundsPage from "./pages/GroundsPage";
 import PageNotFound from "./pages/PageNotFound";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
+import MyBookings from "./pages/MyBookings";
+import BookGround from "./pages/BookGround";
+import OwnerDashboard from "./pages/OwnerDashboard";
+import ManageAvailability from "./pages/ManageAvailability";
+import AdminApproval from "./pages/AdminApproval";
 
 const HeaderLayout = () => (
     <>
@@ -38,6 +43,11 @@ const router = createBrowserRouter(
                 { path: "contact", element: <Contact /> },
                 { path: "auth", element: <AuthPage /> },
                 { path: "profile", element: <Profile /> },
+                { path: "my-bookings", element: <MyBookings /> },
+                { path: "book/:id", element: <BookGround /> },
+                { path: "owner/dashboard", element: <OwnerDashboard /> },
+                { path: "owner/grounds/:id/availability", element: <ManageAvailability /> },
+                { path: "admin/approvals", element: <AdminApproval /> },
                 { path: "*", element: <PageNotFound /> },
             ],
         },

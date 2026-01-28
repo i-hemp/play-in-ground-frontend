@@ -2,6 +2,7 @@ import { useState } from "react";
 import { API_URL } from "../lib/api";
 import axios from "axios";
 import FormInput from "./FormInput";
+import { toast } from "react-toastify";
 
 export default function Signup({ onSwitch }) {
     const [name, setName] = useState("");
@@ -19,12 +20,24 @@ export default function Signup({ onSwitch }) {
                 role, // Send role to Go backend
             });
             console.log(res.data);
-            alert("Signup successful, now login!");
-            onSwitch();
+            toast.success("Signup successful! Please login now.");
+            setTimeout(() => {
+                onSwitch();
+            }, 1500);
         } catch (err) {
             console.log(err.response);
             console.log(err);
-            alert("Signup failed");
+
+            // Handle different error types
+            if (!err.response) {
+                toast.error("No internet connection. Please check your network.");
+            } else if (err.response.status === 400) {
+                toast.error(err.response?.data?.error || "Invalid signup details.");
+            } else if (err.response.status === 500) {
+                toast.error("Server error. Please try again later.");
+            } else {
+                toast.error("Signup failed. Please try again.");
+            }
         }
     };
 

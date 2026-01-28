@@ -3,6 +3,7 @@ import FormInput from "./FormInput";
 import { API_URL } from "../lib/api";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Login({ onSwitch }) {
     const [email, setEmail] = useState("");
@@ -23,12 +24,25 @@ export default function Login({ onSwitch }) {
             localStorage.setItem("name", res.data.name);
             localStorage.setItem("role", res.data.role);
 
-            alert("Login successful!");
-            window.location.reload(); // update navbar
-            navigate("/profile"); // Redirect to profile page
+            toast.success("Login successful! Welcome back!");
+
+            // Redirect to grounds page instead of profile
+            setTimeout(() => {
+                window.location.href = "/grounds";
+            }, 1000);
         } catch (err) {
             console.log(err.response);
-            alert("Login failed");
+
+            // Handle different error types
+            if (!err.response) {
+                toast.error("No internet connection. Please check your network.");
+            } else if (err.response.status === 401) {
+                toast.error("Invalid email or password. Please try again.");
+            } else if (err.response.status === 500) {
+                toast.error("Server error. Please try again later.");
+            } else {
+                toast.error(err.response?.data?.error || "Login failed. Please try again.");
+            }
         }
     };
 
