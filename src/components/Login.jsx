@@ -26,9 +26,17 @@ export default function Login({ onSwitch }) {
 
             toast.success("Login successful! Welcome back!");
 
-            // Redirect to grounds page instead of profile
+            // Check if there's a redirect URL stored (from booking attempt)
+            const redirectUrl = localStorage.getItem('redirectAfterLogin');
+
+            // Redirect to stored URL or default to grounds page
             setTimeout(() => {
-                window.location.href = "/grounds";
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin'); // Clean up
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = "/grounds";
+                }
             }, 1000);
         } catch (err) {
             console.log(err.response);

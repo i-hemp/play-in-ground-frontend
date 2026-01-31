@@ -32,6 +32,16 @@ function BookGround() {
         setError('');
         setLoading(true);
 
+        // Check if user is logged in
+        if (!token) {
+            toast.error("Please login to book a ground");
+            setLoading(false);
+            // Store current URL to redirect back after login
+            localStorage.setItem('redirectAfterLogin', window.location.pathname);
+            navigate('/auth');
+            return;
+        }
+
         try {
             const bookingData = {
                 ground_id: id,
@@ -39,7 +49,7 @@ function BookGround() {
                 start_time: startTime,
                 duration_hours: parseInt(duration)
             };
-console.log("TOKEN:", token);
+            console.log("TOKEN:", token);
 
             await createBooking(bookingData, token);
             toast.success('Booking created successfully!');
@@ -84,7 +94,7 @@ console.log("TOKEN:", token);
                         min={today}
                         max={maxDateStr}
                         required
-                        className="w-full border rounded px-3 py-2"
+                        className="w-full border rounded px-3 py-2 text-black"
                     />
                     <p className="text-sm text-gray-500 mt-1">
                         You can book up to 3 days in advance
@@ -100,7 +110,7 @@ console.log("TOKEN:", token);
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
                         required
-                        className="w-full border rounded px-3 py-2"
+                        className="w-full border rounded px-3 py-2 text-black"
                     >
                         {/* Generate time slots from 6 AM to 10 PM */}
                         {Array.from({ length: 17 }, (_, i) => {
@@ -127,7 +137,7 @@ console.log("TOKEN:", token);
                         value={duration}
                         onChange={(e) => setDuration(e.target.value)}
                         required
-                        className="w-full border rounded px-3 py-2"
+                        className="w-full border rounded px-3 py-2 text-black"
                     >
                         <option value="1">1 hour</option>
                         <option value="2">2 hours</option>

@@ -23,6 +23,22 @@ export default function AuthProvider({ children }) {
         const role = localStorage.getItem("role");
 
         if (storedToken) {
+            // Check if token is expired
+            try {
+                const payload = JSON.parse(atob(storedToken.split('.')[1]));
+                const expiry = payload.exp * 1000; // Convert to milliseconds
+
+                if (Date.now() > expiry) {
+                    // Token expired - logout
+                    logout();
+                    return;
+                }
+            } catch (e) {
+                // Invalid token format - logout
+                logout();
+                return;
+            }
+
             setIsLoggedIn(true);
             setToken(storedToken);
             if (name) setUserInitial(name[0].toUpperCase());

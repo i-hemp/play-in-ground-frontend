@@ -21,13 +21,15 @@ import ManageAvailability from "./pages/ManageAvailability";
 import AdminApproval from "./pages/AdminApproval";
 
 const HeaderLayout = () => (
-    <>
+    <div className="flex flex-col min-h-screen">
         <header>
             <NavBar />
         </header>
-        <Outlet />
+        <main className="flex-grow">
+            <Outlet />
+        </main>
         <Footer />
-    </>
+    </div>
 );
 
 const router = createBrowserRouter(
