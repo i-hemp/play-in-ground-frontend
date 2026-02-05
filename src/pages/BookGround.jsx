@@ -17,6 +17,7 @@ function BookGround() {
     const [duration, setDuration] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
@@ -29,8 +30,15 @@ function BookGround() {
     // Handle booking submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Prevent double submission
+        if (isSubmitting) {
+            return;
+        }
+
         setError('');
         setLoading(true);
+        setIsSubmitting(true);
 
         // Check if user is logged in
         if (!token) {
@@ -68,6 +76,7 @@ function BookGround() {
             }
         } finally {
             setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
@@ -153,7 +162,7 @@ function BookGround() {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || isSubmitting}
                     className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
                 >
                     {loading ? 'Creating Booking...' : 'Book Now'}

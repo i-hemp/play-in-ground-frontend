@@ -8,10 +8,18 @@ import { toast } from "react-toastify";
 export default function Login({ onSwitch }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+
+        // Prevent double submission
+        if (isSubmitting) {
+            return;
+        }
+
+        setIsSubmitting(true);
 
         try {
             const res = await axios.post(`${API_URL}/auth/login`, {
@@ -39,6 +47,7 @@ export default function Login({ onSwitch }) {
                 }
             }, 1000);
         } catch (err) {
+            setIsSubmitting(false);
             console.log(err.response);
 
             // Handle different error types

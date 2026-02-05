@@ -9,9 +9,18 @@ export default function Signup({ onSwitch }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("player"); // Default role
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSignup = async (e) => {
         e.preventDefault();
+
+        // Prevent double submission
+        if (isSubmitting) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
         try {
             const res = await axios.post(`${API_URL}/auth/signup`, {
                 name,
@@ -25,6 +34,7 @@ export default function Signup({ onSwitch }) {
                 onSwitch();
             }, 1500);
         } catch (err) {
+            setIsSubmitting(false);
             console.log(err.response);
             console.log(err);
 
