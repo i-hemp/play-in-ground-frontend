@@ -15,11 +15,13 @@ export default function AuthProvider({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userInitial, setUserInitial] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
     const [token, setToken] = useState(null);
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         const name = localStorage.getItem("name");
+        const email = localStorage.getItem("email");
         const role = localStorage.getItem("role");
 
         if (storedToken) {
@@ -42,6 +44,7 @@ export default function AuthProvider({ children }) {
             setIsLoggedIn(true);
             setToken(storedToken);
             if (name) setUserInitial(name[0].toUpperCase());
+            if (email) setUserEmail(email);
             if (role) setUserRole(role);
         } else {
             setIsLoggedIn(false);
@@ -51,15 +54,17 @@ export default function AuthProvider({ children }) {
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("name");
+        localStorage.removeItem("email");
         localStorage.removeItem("role");
         setIsLoggedIn(false);
         setUserInitial(null);
+        setUserEmail(null);
         setUserRole(null);
         setToken(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, userInitial, userRole, token, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, userInitial, userRole, userEmail, token, logout }}>
             {children}
         </AuthContext.Provider>
     );

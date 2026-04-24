@@ -27,9 +27,10 @@ export default function Login({ onSwitch }) {
                 password,
             });
 
-            // Save token, name, and role from Go backend response
+            // Save token, name, email, and role from Go backend response
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("name", res.data.name);
+            localStorage.setItem("email", res.data.email);
             localStorage.setItem("role", res.data.role);
 
             toast.success("Login successful! Welcome back!");

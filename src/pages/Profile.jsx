@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Profile() {
+    const { userEmail: emailFromAuth, userRole: roleFromAuth } = useAuth();
     const [name, setName] = useState("");
     const [role, setRole] = useState("");
+    const [email, setEmail] = useState("");
 
     useEffect(() => {
         // Get user data from localStorage
         const storedName = localStorage.getItem("name");
         const storedRole = localStorage.getItem("role");
+        const storedEmail = localStorage.getItem("email");
 
         if (storedName) setName(storedName);
-        if (storedRole) setRole(storedRole);
-    }, []);
+        if (storedRole || roleFromAuth) setRole(storedRole || roleFromAuth);
+        if (storedEmail || emailFromAuth) setEmail(storedEmail || emailFromAuth);
+    }, [emailFromAuth, roleFromAuth]);
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -22,6 +27,11 @@ export default function Profile() {
                     <div className="mb-4">
                         <label className="text-gray-400">Name:</label>
                         <p className="text-2xl font-semibold">{name || "Not logged in"}</p>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="text-gray-400">Email:</label>
+                        <p className="text-xl">{email || "N/A"}</p>
                     </div>
 
                     <div className="mb-4">
