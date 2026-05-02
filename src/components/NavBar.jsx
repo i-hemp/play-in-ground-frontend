@@ -81,30 +81,12 @@ function Navbar() {
                                         </div>
                                         
                                         <Link
-                                            to="/profile"
-                                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                                            to="/dashboard"
+                                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white font-semibold"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
-                                            My Profile
+                                            Dashboard
                                         </Link>
-                                        
-                                        <Link
-                                            to="/my-bookings"
-                                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
-                                            onClick={() => setIsMenuOpen(false)}
-                                        >
-                                            My Bookings
-                                        </Link>
-
-                                        {userRole === "owner" && (
-                                            <Link
-                                                to="/owner/dashboard"
-                                                className="block px-4 py-2 text-sm text-green-400 hover:bg-gray-700 hover:text-green-300 font-medium"
-                                                onClick={() => setIsMenuOpen(false)}
-                                            >
-                                                Owner Dashboard
-                                            </Link>
-                                        )}
 
                                         <button
                                             onClick={handleLogout}

@@ -14,6 +14,8 @@ export default function GroundsPage() {
     const [filteredGrounds, setFilteredGrounds] = useState([]);
     const [query, setQuery] = useState("");
     const [selectedSports, setSelectedSports] = useState([]);
+    const [sortBy, setSortBy] = useState("default"); // default, priceLowHigh, priceHighLow
+    const [maxPrice, setMaxPrice] = useState(2000);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,17 +26,17 @@ export default function GroundsPage() {
                 setFilteredGrounds(response.data);
             } catch (error) {
                 console.error("Failed to fetch grounds:", error);
-                toast.error("Failed to load grounds. Please try again.");
+                toast.error("Failed to load grounds.");
             }
         }
         loadData();
     }, []);
 
-    // Filter logic
+    // Filter and Sort logic
     useEffect(() => {
-        let results = grounds;
+        let results = [...grounds];
 
-        // Search query filter
+        // 1. Search query
         if (query) {
             const q = query.toLowerCase();
             results = results.filter(g => 
@@ -43,21 +45,31 @@ export default function GroundsPage() {
             );
         }
 
-        // Sport type filter (OR logic - if ground supports any selected sport)
+        // 2. Sport selection
         if (selectedSports.length > 0) {
             results = results.filter(g => 
                 g.sport_types?.some(s => selectedSports.includes(s))
             );
         }
 
+        // 3. Price limit
+        results = results.filter(g => g.price_per_hour <= maxPrice);
+
+        // 4. Sorting
+        if (sortBy === "priceLowHigh") {
+            results.sort((a, b) => a.price_per_hour - b.price_per_hour);
+        } else if (sortBy === "priceHighLow") {
+            results.sort((a, b) => b.price_per_hour - a.price_per_hour);
+        } else if (sortBy === "name") {
+            results.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
         setFilteredGrounds(results);
-    }, [query, grounds, selectedSports]);
+    }, [query, grounds, selectedSports, sortBy, maxPrice]);
 
     const toggleSport = (sport) => {
         setSelectedSports(prev => 
-            prev.includes(sport) 
-                ? prev.filter(s => s !== sport) 
-                : [...prev, sport]
+            prev.includes(sport) ? prev.filter(s => s !== sport) : [...prev, sport]
         );
     };
 
@@ -65,11 +77,11 @@ export default function GroundsPage() {
         const token = localStorage.getItem("token");
         if (!token) {
             toast.error("Please login to book a ground");
-            localStorage.setItem('redirectAfterLogin', `/book/${selectedGround.id}`);
+            localStorage.setItem('redirectAfterLogin', `/grounds/${selectedGround.id}`);
             navigate("/auth");
             return;
         }
-        navigate(`/book/${selectedGround.id}`);
+        navigate(`/grounds/${selectedGround.id}`);
     };
 
     return (
@@ -81,29 +93,66 @@ export default function GroundsPage() {
                         Find Your <span className="text-green-500">Playground</span>
                     </h1>
                     
-                    <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                    <div className="flex flex-col lg:flex-row gap-8 items-stretch lg:items-end">
                         {/* Search Input */}
-                        <div className="relative flex-1 group w-full md:w-auto">
-                            <input
-                                type="text"
-                                placeholder="Search by name or location..."
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                className="w-full bg-gray-900 border border-gray-700 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-green-500 outline-none transition group-hover:border-gray-600"
-                            />
-                            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+                        <div className="flex-1 space-y-3">
+                            <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Search</label>
+                            <div className="relative group">
+                                <input
+                                    type="text"
+                                    placeholder="Name or location..."
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-green-500 outline-none transition group-hover:border-gray-600"
+                                />
+                                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+                            </div>
                         </div>
 
-                        {/* Sport Toggles */}
-                        <div className="flex flex-wrap gap-2">
+                        {/* Price Range */}
+                        <div className="w-full lg:w-64 space-y-3">
+                            <div className="flex justify-between items-center px-1">
+                                <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Max Price</label>
+                                <span className="text-sm font-bold text-green-500">₹{maxPrice}/hr</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max="2000"
+                                step="100"
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(parseInt(e.target.value))}
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
+                            />
+                        </div>
+
+                        {/* Sort By */}
+                        <div className="w-full lg:w-48 space-y-3">
+                            <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Sort By</label>
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-4 focus:ring-2 focus:ring-green-500 outline-none transition cursor-pointer"
+                            >
+                                <option value="default">Release Date</option>
+                                <option value="priceLowHigh">Price: Low to High</option>
+                                <option value="priceHighLow">Price: High to Low</option>
+                                <option value="name">Alphabetical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Sport Toggles */}
+                    <div className="mt-8 pt-8 border-t border-gray-800">
+                        <div className="flex flex-wrap gap-3">
                             {SPORT_OPTIONS.map(sport => (
                                 <button
                                     key={sport}
                                     onClick={() => toggleSport(sport)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${
+                                    className={`px-5 py-2.5 rounded-xl text-sm font-bold border transition-all ${
                                         selectedSports.includes(sport)
                                             ? 'bg-green-500 text-black border-green-500 shadow-lg shadow-green-500/20'
-                                            : 'bg-gray-900 text-gray-400 border-gray-700 hover:border-gray-600'
+                                            : 'bg-gray-900 text-gray-400 border-gray-700 hover:border-gray-500'
                                     }`}
                                 >
                                     {sport}

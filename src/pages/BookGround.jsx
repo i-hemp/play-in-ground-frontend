@@ -289,8 +289,12 @@ function BookGround() {
                                     nowPlus2.setHours(nowPlus2.getHours() + 2);
                                     const isTooSoon = bookingDate === today && slotTime < nowPlus2;
 
-                                    // 2. Booking Conflict Check (Existing bookings)
-                                    const isBooked = Array.isArray(bookedSlots) && bookedSlots.some(s => s.start_time === timeStr);
+                                    // 2. Booking Conflict Check (Existing bookings - check full range)
+                                    const isBooked = Array.isArray(bookedSlots) && bookedSlots.some(s => {
+                                        const sStart = parseInt(s.start_time.split(':')[0]);
+                                        const sEnd = sStart + (s.duration || 1);
+                                        return hour >= sStart && hour < sEnd;
+                                    });
                                     
                                     // 3. Selection Range Logic
                                     const isSelectedStart = startTime === timeStr;

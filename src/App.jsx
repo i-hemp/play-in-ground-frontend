@@ -13,15 +13,23 @@ import Contact from "./pages/Contact";
 import GroundsPage from "./pages/GroundsPage";
 import PageNotFound from "./pages/PageNotFound";
 import AuthPage from "./pages/AuthPage";
-import Profile from "./pages/Profile";
 import MyBookings from "./pages/MyBookings";
 import BookGround from "./pages/BookGround";
+import BookingDetails from "./pages/BookingDetails";
+import DashboardLayout from "./layouts/DashboardLayout";
+import PlayerDashboard from "./pages/PlayerDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
-import ManageAvailability from "./pages/ManageAvailability";
-import AdminApproval from "./pages/AdminApproval";
+import { useAuth } from "./context/AuthContext";
+
+// Simple index redirector for the dashboard
+const DashboardIndex = () => {
+    const { userRole } = useAuth();
+    if (userRole === 'owner') return <OwnerDashboard />;
+    return <PlayerDashboard />;
+};
 
 const HeaderLayout = () => (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-900">
         <header>
             <NavBar />
         </header>
@@ -41,18 +49,26 @@ const router = createBrowserRouter(
                 { index: true, element: <Navigate to="/home" /> },
                 { path: "home", element: <Home /> },
                 { path: "grounds", element: <GroundsPage /> },
+                { path: "grounds/:id", element: <BookGround /> },
                 { path: "about", element: <About /> },
                 { path: "contact", element: <Contact /> },
                 { path: "auth", element: <AuthPage /> },
-                { path: "profile", element: <Profile /> },
-                { path: "my-bookings", element: <MyBookings /> },
-                { path: "book/:id", element: <BookGround /> },
-                { path: "owner/dashboard", element: <OwnerDashboard /> },
-                { path: "owner/grounds/:id/availability", element: <ManageAvailability /> },
-                { path: "admin/approvals", element: <AdminApproval /> },
+                { path: "my-bookings", element: <Navigate to="/dashboard/history" /> },
+                { path: "profile", element: <Navigate to="/dashboard" /> },
                 { path: "*", element: <PageNotFound /> },
             ],
         },
+        {
+            path: "/dashboard",
+            element: <DashboardLayout />,
+            children: [
+                { index: true, element: <DashboardIndex /> },
+                { path: "history", element: <MyBookings /> },
+                { path: "booking/:id", element: <BookingDetails /> },
+                { path: "grounds", element: <OwnerDashboard /> }, // Reusing for now
+                { path: "*", element: <Navigate to="/dashboard" /> }
+            ]
+        }
     ],
     {
         future: {

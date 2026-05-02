@@ -190,3 +190,54 @@ export const rejectScheduleRequest = async (requestId, token) => {
 
     return response.json();
 };
+
+// Owner: Get own grounds
+export const getOwnerGrounds = async (token) => {
+    const response = await fetch(`${API_URL}/grounds/my-grounds`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch grounds');
+    }
+
+    return response.json();
+};
+
+// Owner: Get dashboard stats
+export const getOwnerStats = async (token) => {
+    const response = await fetch(`${API_URL}/bookings/owner-stats`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch stats');
+    }
+
+    return response.json();
+};
+
+// Owner: Update ground details
+export const updateGround = async (groundId, groundData, token) => {
+    const response = await fetch(`${API_URL}/grounds/locations/${groundId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(groundData)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update ground');
+    }
+
+    return response.json();
+};

@@ -8,7 +8,7 @@ function MyBookings() {
     const { token } = useAuth();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
 
     useEffect(() => {
         if (token) loadBookings();
@@ -38,32 +38,49 @@ function MyBookings() {
         }
     };
 
+    const filteredBookings = filterStatus === 'all' 
+        ? bookings 
+        : bookings.filter(b => b.status === filterStatus);
+
     if (loading) return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white pb-20">
-            <div className="max-w-5xl mx-auto px-6 pt-12">
-                <div className="flex justify-between items-center mb-10">
-                    <h1 className="text-4xl font-extrabold tracking-tight">My Bookings</h1>
-                    <Link to="/grounds" className="text-green-500 hover:text-green-400 font-bold transition">
-                        + New Booking
-                    </Link>
-                </div>
+        <div className="space-y-8">
+            <div className="flex justify-between items-center px-4">
+                <h1 className="text-4xl font-extrabold tracking-tight text-white">Booking History</h1>
+                <Link to="/grounds" className="text-green-500 hover:text-green-400 font-bold transition">
+                    + New Booking
+                </Link>
+            </div>
 
-                {bookings.length === 0 ? (
-                    <div className="text-center py-20 bg-gray-800 rounded-[2rem] border border-dashed border-gray-700">
-                        <p className="text-gray-400 text-xl mb-6">No bookings yet. Ready to start playing?</p>
-                        <Link to="/grounds" className="inline-block px-8 py-3 bg-green-500 text-black font-bold rounded-full hover:bg-green-400 transition">
-                            Explore Venues
-                        </Link>
-                    </div>
-                ) : (
-                    <div className="space-y-6">
-                        {bookings.map((booking) => {
+            {/* Filter Tabs */}
+            <div className="flex gap-4 px-4 pb-2">
+                {['all', 'confirmed', 'cancelled'].map((status) => (
+                    <button
+                        key={status}
+                        onClick={() => setFilterStatus(status)}
+                        className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                            filterStatus === status 
+                                ? 'bg-green-500 text-black shadow-lg shadow-green-500/20' 
+                                : 'bg-gray-800 text-gray-400 hover:text-white border border-gray-700'
+                        }`}
+                    >
+                        {status}
+                    </button>
+                ))}
+            </div>
+
+            {filteredBookings.length === 0 ? (
+                <div className="text-center py-20 bg-gray-800 rounded-[2rem] border border-dashed border-gray-700">
+                    <p className="text-gray-400 text-xl mb-6">No {filterStatus !== 'all' ? filterStatus : ''} bookings found.</p>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {filteredBookings.map((booking) => {
                             // Extract data from the aggregated response
                             // The backend returns it as a map where keys are fields from Booking model
                             // and ground_details is the joined object
@@ -134,7 +151,6 @@ function MyBookings() {
                         })}
                     </div>
                 )}
-            </div>
         </div>
     );
 }

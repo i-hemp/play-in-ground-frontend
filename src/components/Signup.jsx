@@ -28,11 +28,38 @@ export default function Signup({ onSwitch }) {
                 password,
                 role, // Send role to Go backend
             });
-            console.log(res.data);
-            toast.success("Signup successful! Please login now.");
-            setTimeout(() => {
-                onSwitch();
-            }, 1500);
+            toast.success("Signup successful! Logging you in...");
+
+            // Auto-login after signup
+            try {
+                const loginRes = await axios.post(`${API_URL}/auth/login`, {
+                    email,
+                    password,
+                });
+
+                // Save session info
+                localStorage.setItem("token", loginRes.data.token);
+                localStorage.setItem("name", loginRes.data.name);
+                localStorage.setItem("email", loginRes.data.email);
+                localStorage.setItem("role", loginRes.data.role);
+
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+
+                setTimeout(() => {
+                    if (redirectUrl) {
+                        localStorage.removeItem('redirectAfterLogin');
+                        window.location.href = redirectUrl;
+                    } else {
+                        window.location.href = "/home";
+                    }
+                }, 1000);
+            } catch (loginErr) {
+                console.error("Auto-login failed:", loginErr);
+                toast.info("Account created! Please login manually.");
+                setTimeout(() => {
+                    onSwitch();
+                }, 1500);
+            }
         } catch (err) {
             setIsSubmitting(false);
             console.log(err.response);

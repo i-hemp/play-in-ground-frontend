@@ -1,12 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html{
-  background-color: #111827;
-  color: white;
+:root {
+  /* Premium Color Palette [UI-1] */
+  --clr-bg: #0F172A;
+  --clr-surface: #1E293B;
+  --clr-border: #334155;
+  --clr-accent: #22C55E;
+  --clr-danger: #EF4444;
+  --clr-warn: #F59E0B;
+  --clr-text: #F1F5F9;
+  --clr-muted: #94A3B8;
+  
+  --font-main: 'Outfit', sans-serif;
 }
 
-input {
-  color: black;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar for Premium Look */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--clr-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--clr-border);
+  border-radius: 10px;
+  border: 3px solid var(--clr-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-muted);
+}
+
+/* Glassmorphism Utility */
+.glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Transitions */
+.transition-standard {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Input focusing fix */
+input, select, textarea {
+  font-family: inherit;
 }

@@ -44,7 +44,7 @@ export default function Login({ onSwitch }) {
                     localStorage.removeItem('redirectAfterLogin'); // Clean up
                     window.location.href = redirectUrl;
                 } else {
-                    window.location.href = "/grounds";
+                    window.location.href = "/home";
                 }
             }, 1000);
         } catch (err) {
