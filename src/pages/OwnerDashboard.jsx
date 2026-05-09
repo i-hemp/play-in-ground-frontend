@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getOwnerGrounds, getOwnerStats } from '../lib/bookingApi';
+import { getOwnerGrounds, getOwnerStats, deleteGround } from '../lib/bookingApi';
 import { useAuth } from '../context/AuthContext';
 import { 
     Users, 
@@ -8,7 +8,8 @@ import {
     Plus,
     Edit3,
     Trash2,
-    ArrowUpRight
+    ArrowUpRight,
+    Loader2
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
@@ -18,24 +19,41 @@ function OwnerDashboard() {
     const [stats, setStats] = useState({ total_bookings: 0, total_revenue: 0, active_grounds: 0 });
     const [grounds, setGrounds] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
+
+    const loadDashboardData = async () => {
+        try {
+            const [statsRes, groundsRes] = await Promise.all([
+                getOwnerStats(token),
+                getOwnerGrounds(token)
+            ]);
+            setStats(statsRes);
+            setGrounds(groundsRes);
+        } catch (err) {
+            toast.error("Failed to load dashboard data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        async function loadDashboardData() {
-            try {
-                const [statsRes, groundsRes] = await Promise.all([
-                    getOwnerStats(token),
-                    getOwnerGrounds(token)
-                ]);
-                setStats(statsRes);
-                setGrounds(groundsRes);
-            } catch (err) {
-                toast.error("Failed to load dashboard data");
-            } finally {
-                setLoading(false);
-            }
-        }
         loadDashboardData();
     }, [token]);
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this ground? This action cannot be undone.")) return;
+        
+        setDeletingId(id);
+        try {
+            await deleteGround(id, token);
+            toast.success("Ground deleted successfully");
+            loadDashboardData();
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     const statCards = [
         { label: 'Total Revenue', value: `₹${stats.total_revenue || 0}`, icon: CreditCard, color: 'text-green-500', bg: 'bg-green-500/10' },
@@ -100,6 +118,21 @@ function OwnerDashboard() {
                                     <img src={ground.image_url} alt={ground.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                 </div>
                                 <div className="flex-1 min-w-0">
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {ground.status === 'pending' ? (
+                                            <span className="text-[10px] uppercase tracking-wider font-black px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                                                Pending Verification
+                                            </span>
+                                        ) : ground.status === 'active' ? (
+                                            <span className="text-[10px] uppercase tracking-wider font-black px-3 py-1 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">
+                                                Verified & Active
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] uppercase tracking-wider font-black px-3 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20">
+                                                {ground.status}
+                                            </span>
+                                        )}
+                                    </div>
                                     <h3 className="text-xl font-bold text-white truncate mb-1">{ground.name}</h3>
                                     <p className="text-gray-400 text-sm flex items-center gap-1 mb-3">
                                         <MapPin size={14} className="text-green-500" />
@@ -120,8 +153,12 @@ function OwnerDashboard() {
                                     >
                                         <Edit3 size={18} />
                                     </Link>
-                                    <button className="p-3.5 bg-gray-700/50 text-gray-400 rounded-2xl hover:bg-red-500/10 hover:text-red-500 transition-all border border-transparent hover:border-red-500/20">
-                                        <Trash2 size={18} />
+                                    <button 
+                                        onClick={() => handleDelete(ground.id)}
+                                        disabled={deletingId === ground.id}
+                                        className="p-3.5 bg-gray-700/50 text-gray-400 rounded-2xl hover:bg-red-500/10 hover:text-red-500 transition-all border border-transparent hover:border-red-500/20 disabled:opacity-50"
+                                    >
+                                        {deletingId === ground.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
                                     </button>
                                 </div>
                             </div>

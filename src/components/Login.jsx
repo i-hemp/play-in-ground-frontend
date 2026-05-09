@@ -4,6 +4,7 @@ import { API_URL } from "../lib/api";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { LogIn, Loader2 } from "lucide-react";
 
 export default function Login({ onSwitch }) {
     const [email, setEmail] = useState("");
@@ -13,35 +14,22 @@ export default function Login({ onSwitch }) {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
-        // Prevent double submission
-        if (isSubmitting) {
-            return;
-        }
+        if (isSubmitting) return;
 
         setIsSubmitting(true);
-
         try {
-            const res = await axios.post(`${API_URL}/auth/login`, {
-                email,
-                password,
-            });
-
-            // Save token, name, email, and role from Go backend response
+            const res = await axios.post(`${API_URL}/auth/login`, { email, password });
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("name", res.data.name);
             localStorage.setItem("email", res.data.email);
             localStorage.setItem("role", res.data.role);
 
-            toast.success("Login successful! Welcome back!");
-
-            // Check if there's a redirect URL stored (from booking attempt)
+            toast.success("Welcome back!");
             const redirectUrl = localStorage.getItem('redirectAfterLogin');
-
-            // Redirect to stored URL or default to grounds page
+            
             setTimeout(() => {
                 if (redirectUrl) {
-                    localStorage.removeItem('redirectAfterLogin'); // Clean up
+                    localStorage.removeItem('redirectAfterLogin');
                     window.location.href = redirectUrl;
                 } else {
                     window.location.href = "/home";
@@ -49,61 +37,51 @@ export default function Login({ onSwitch }) {
             }, 1000);
         } catch (err) {
             setIsSubmitting(false);
-            console.log(err.response);
-
-            // Handle different error types
-            if (!err.response) {
-                toast.error("No internet connection. Please check your network.");
-            } else if (err.response.status === 401) {
-                toast.error("Invalid email or password. Please try again.");
-            } else if (err.response.status === 500) {
-                toast.error("Server error. Please try again later.");
-            } else {
-                toast.error(err.response?.data?.error || "Login failed. Please try again.");
-            }
+            toast.error(err.response?.data?.error || "Login failed");
         }
     };
 
     return (
-        <form
-            onSubmit={handleLogin}
-            style={{
-                width: "300px",
-                padding: "20px",
-                border: "1px solid #ddd",
-                borderRadius: "10px",
-            }}
-        >
-            <h2 className="text-center text-lg font-bold">Login</h2>
+        <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-1 mb-8 text-center">
+                <h2 className="text-2xl font-black text-white">Login</h2>
+                <p className="text-gray-500 text-sm">Enter your credentials to continue</p>
+            </div>
 
-            <FormInput label="Email" type="email" value={email} onChange={setEmail} />
+            <FormInput 
+                label="Email Address" 
+                type="email" 
+                value={email} 
+                onChange={setEmail} 
+                placeholder="name@company.com"
+            />
 
             <FormInput
                 label="Password"
                 type="password"
                 value={password}
                 onChange={setPassword}
+                placeholder="••••••••"
             />
 
             <button
                 type="submit"
-                style={{
-                    padding: "10px",
-                    background: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    marginLeft: "90px",
-                }}
+                disabled={isSubmitting}
+                className="w-full py-4 bg-green-500 text-black font-black rounded-2xl hover:bg-green-400 transition transform hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-3 disabled:opacity-50"
             >
+                {isSubmitting ? <Loader2 className="animate-spin" /> : <LogIn size={20} />}
                 Login
             </button>
 
-            <p style={{ marginTop: "10px", textAlign: "center" }}>
-                Don't have an account?
-                <span style={{ color: "blue", cursor: "pointer" }} onClick={onSwitch}>
-                    Sign Up
-                </span>
+            <p className="text-center text-gray-500 text-sm font-medium mt-6">
+                Don't have an account?{" "}
+                <button 
+                    type="button"
+                    className="text-green-500 hover:text-green-400 font-bold" 
+                    onClick={onSwitch}
+                >
+                    Create Account
+                </button>
             </p>
         </form>
     );

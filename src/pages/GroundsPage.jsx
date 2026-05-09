@@ -10,7 +10,6 @@ const SPORT_OPTIONS = ["Football", "Cricket", "Badminton", "Tennis", "Basketball
 
 export default function GroundsPage() {
     const [grounds, setGrounds] = useState([]);
-    const [selectedGround, setSelectedGround] = useState(null);
     const [filteredGrounds, setFilteredGrounds] = useState([]);
     const [query, setQuery] = useState("");
     const [selectedSports, setSelectedSports] = useState([]);
@@ -71,17 +70,6 @@ export default function GroundsPage() {
         setSelectedSports(prev => 
             prev.includes(sport) ? prev.filter(s => s !== sport) : [...prev, sport]
         );
-    };
-
-    const handleBookNow = () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            toast.error("Please login to book a ground");
-            localStorage.setItem('redirectAfterLogin', `/grounds/${selectedGround.id}`);
-            navigate("/auth");
-            return;
-        }
-        navigate(`/grounds/${selectedGround.id}`);
     };
 
     return (
@@ -186,64 +174,11 @@ export default function GroundsPage() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredGrounds.map((g) => (
-                            <GroundCard key={g.id} ground={g} onClick={setSelectedGround} />
+                            <GroundCard key={g.id} ground={g} />
                         ))}
                     </div>
                 )}
             </section>
-
-            {/* Premium Detail Modal */}
-            {selectedGround && (
-                <div
-                    className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex justify-center items-center p-4"
-                    onClick={() => setSelectedGround(null)}
-                >
-                    <div
-                        className="bg-gray-800 rounded-[2.5rem] overflow-hidden w-full max-w-2xl border border-gray-700 flex flex-col md:flex-row shadow-2xl animate-in fade-in zoom-in duration-300"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="md:w-1/2 h-64 md:h-auto relative">
-                            <img src={selectedGround.image_url} alt={selectedGround.name} className="w-full h-full object-cover" />
-                            <button 
-                                onClick={() => setSelectedGround(null)}
-                                className="absolute top-4 right-4 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className="p-8 md:w-1/2 flex flex-col">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {selectedGround.sport_types?.map((sport, i) => (
-                                    <span key={i} className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-black tracking-widest border border-green-500/20">
-                                        {sport}
-                                    </span>
-                                ))}
-                            </div>
-                            
-                            <h2 className="text-3xl font-extrabold mb-2">{selectedGround.name}</h2>
-                            <p className="text-gray-400 mb-6 flex items-center gap-2">📍 {selectedGround.place}</p>
-                            
-                            <p className="text-gray-300 text-sm leading-relaxed flex-1 mb-8">
-                                {selectedGround.description || "Experience top-tier amenities and professional maintenance at this premium venue."}
-                            </p>
-
-                            <div className="pt-6 border-t border-gray-700 flex items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Pricing</p>
-                                    <p className="text-2xl font-black text-green-400">₹{selectedGround.price_per_hour}<span className="text-xs text-gray-500 font-normal ml-1">/hr</span></p>
-                                </div>
-                                <button
-                                    onClick={handleBookNow}
-                                    className="px-8 py-3 bg-green-500 text-black font-extrabold rounded-2xl hover:bg-green-400 transition transform hover:scale-105 shadow-xl shadow-green-500/20"
-                                >
-                                    Book Now
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </main>
     );
 }

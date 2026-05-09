@@ -1,7 +1,9 @@
-export default function GroundCard({ ground, onClick }) {
+import { Link } from 'react-router-dom';
+
+export default function GroundCard({ ground }) {
     return (
-        <div
-            onClick={() => onClick(ground)}
+        <Link
+            to={`/grounds/${ground.id}`}
             className="group bg-gray-800 rounded-[2rem] overflow-hidden border border-gray-700 hover:border-green-500/50 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-green-500/10 flex flex-col h-full"
         >
             {/* Image Section */}
@@ -42,12 +44,12 @@ export default function GroundCard({ ground, onClick }) {
                 </p>
 
                 <div className="mt-auto pt-4 border-t border-gray-700/50 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Details</span>
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">View Details</span>
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center group-hover:bg-green-500 group-hover:text-black transition-colors">
                         →
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

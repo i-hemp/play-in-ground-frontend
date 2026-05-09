@@ -241,3 +241,20 @@ export const updateGround = async (groundId, groundData, token) => {
 
     return response.json();
 };
+
+// Owner: Delete ground
+export const deleteGround = async (groundId, token) => {
+    const response = await fetch(`${API_URL}/grounds/locations/${groundId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete ground');
+    }
+
+    return response.json();
+};

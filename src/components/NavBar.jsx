@@ -88,6 +88,16 @@ function Navbar() {
                                             Dashboard
                                         </Link>
 
+                                        {userRole === 'admin' && (
+                                            <Link
+                                                to="/admin"
+                                                className="block px-4 py-2 text-sm text-green-400 hover:bg-gray-700 hover:text-green-300 font-semibold"
+                                                onClick={() => setIsMenuOpen(false)}
+                                            >
+                                                Admin Panel
+                                            </Link>
+                                        )}
+
                                         <button
                                             onClick={handleLogout}
                                             className="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300"
